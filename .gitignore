@@ -3,3 +3,7 @@ node_modules
 .env
 
 /generated/prisma
+
+parteaTeoreticaNULivrabil.txt
+
+prisma/migrations/20260914104911_add_auth_fields/
