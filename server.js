@@ -1,5 +1,6 @@
 require("dotenv/config")
 
+const cors = require("cors")
 const express = require("express")
 const app = express()
 
@@ -35,6 +36,8 @@ const loginLimiter = rateLimit({
 })
 
 app.use(express.json())
+
+app.use(cors({ origin: "http://localhost:5173" }))
 
 function validate(schema) {
     return function (req, res, next) {
@@ -141,9 +144,15 @@ app.delete("/users/:id",authenticate, async function (req, res, next) {
     try {
         const id = Number(req.params.id)
         const user = await prisma.user.findUnique({ where: { id: id } })
+
         if (!user) {
             return res.status(404).json()
         }
+        const postCount = await prisma.post.count({ where: { userId: id } })
+        if (postCount > 0) {
+            return res.status(409).json({ message: "cannot delete user with posts" })
+        }
+        
         await prisma.user.delete({ where: { id: id } })
         res.status(204).send()
     } catch (err) {
