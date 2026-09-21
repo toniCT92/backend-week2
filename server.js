@@ -1,6 +1,7 @@
 require("./instrument.js")
 require("dotenv/config")
 
+const logger = require("pino")()
 const Sentry = require("@sentry/node")
 
 const cors = require("cors")
@@ -230,13 +231,15 @@ app.post("/login",loginLimiter, validate(loginSchema), async function (req, res,
 Sentry.setupExpressErrorHandler(app)
 
 app.use(function (err, req, res, next) {
-    console.error(err)
+    //console.error(err) - before pino error logging
+    logger.error({ err: err.message, route: req.method + " " + req.url }, "request error")
     res.status(500).json({ message: "Internal server error" })
 })
 
 if (require.main === module) {
   app.listen(process.env.PORT || 3000, function () {
-    console.log("Server started")
+    logger.info("Server started")
+    //console.log("Server started") - before pino
   })
 }
 
