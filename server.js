@@ -1,4 +1,7 @@
+require("./instrument.js")
 require("dotenv/config")
+
+const Sentry = require("@sentry/node")
 
 const cors = require("cors")
 const express = require("express")
@@ -77,6 +80,16 @@ function requireAdmin(req, res, next) {
     }
     next()
 }
+
+
+//temporarry testing route Sentry 
+//app.get("/debug-sentry", function (req, res) {
+  //throw new Error("My first Sentry error!")
+//})
+
+app.get("/health", function(req, res){
+    res.json({status: "ok"})
+})
 
 // admin-only
 app.get("/admin/users", authenticate, requireAdmin, async function (req, res, next) {
@@ -214,11 +227,17 @@ app.post("/login",loginLimiter, validate(loginSchema), async function (req, res,
     }
 })
 
+Sentry.setupExpressErrorHandler(app)
+
 app.use(function (err, req, res, next) {
     console.error(err)
     res.status(500).json({ message: "Internal server error" })
 })
 
-app.listen(process.env.PORT || 3000, function(){
+if (require.main === module) {
+  app.listen(process.env.PORT || 3000, function () {
     console.log("Server started")
-})
+  })
+}
+
+module.exports = app
