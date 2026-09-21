@@ -83,9 +83,9 @@ function requireAdmin(req, res, next) {
 
 
 //temporarry testing route Sentry 
-app.get("/debug-sentry", function (req, res) {
-  throw new Error("My first Sentry error!")
-})
+//app.get("/debug-sentry", function (req, res) {
+  //throw new Error("My first Sentry error!")
+//})
 
 app.get("/health", function(req, res){
     res.json({status: "ok"})
